@@ -32,7 +32,7 @@ from pydantic import BaseModel
 import os
 
 # from openai import AzureOpenAI, ChatCompletion
-from azure.ai.inference import ChatCompletionsClient, ChatCompletions
+from azure.ai.inference import ChatCompletionsClient
 from azure.identity import DefaultAzureCredential
 from azure.core.credentials import AzureKeyCredential
 
@@ -176,7 +176,7 @@ class Pipeline:
             "user": body.get("user", None)
         }
 
-        response: ChatCompletions = None
+        response = None
         try:
             response = self.client.complete(**parameters)
 
@@ -192,7 +192,7 @@ class Pipeline:
             else:
                 return f"Error: {e}"
 
-    def stream_response(self, response: ChatCompletions):
+    def stream_response(self, response):
         for chunk in response:
             choices = chunk.choices
             if choices and len(choices) > 0:
