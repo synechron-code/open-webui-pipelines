@@ -10,6 +10,7 @@ class Pipeline:
         AZURE_DEEPSEEKR1_API_KEY: str
         AZURE_DEEPSEEKR1_ENDPOINT: str
         AZURE_DEEPSEEKR1_API_VERSION: str
+        AZURE_DEEPSEEKR1_MODEL: str
 
     def __init__(self):
         self.type = "manifold"
@@ -19,14 +20,16 @@ class Pipeline:
                 "AZURE_DEEPSEEKR1_API_KEY": os.getenv("AZURE_DEEPSEEKR1_API_KEY", "your-azure-deepseek-r1-api-key-here"),
                 "AZURE_DEEPSEEKR1_ENDPOINT": os.getenv("AZURE_DEEPSEEKR1_ENDPOINT", "your-azure-deepseek-r1-endpoint-here"),
                 "AZURE_DEEPSEEKR1_API_VERSION": os.getenv("AZURE_DEEPSEEKR1_API_VERSION", "2024-05-01-preview"),
+                "AZURE_DEEPSEEKR1_MODEL": os.getenv("AZURE_DEEPSEEKR1_MODEL", "deepseek"),
+                
             }
         )
         self.set_pipelines()
         pass
 
     def set_pipelines(self):
-        models = ['DeepSeek-R1']
-        model_names = ['DeepSeek-R1']
+        models = [self.valves.AZURE_DEEPSEEKR1_MODEL]
+        model_names = [self.valves.AZURE_DEEPSEEKR1_MODEL]
         self.pipelines = [
             {"id": model, "name": name} for model, name in zip(models, model_names)
         ]
