@@ -49,7 +49,7 @@ class Pipeline:
 
     def __init__(self):
         self.type = "manifold"
-        self.name = "Azure OpenAI API: "
+        self.name = "Azure AI Inference: "
         self.valves = self.Valves(
             **{
                 "AZURE_AI_CHAT_KEY": os.getenv("AZURE_AI_CHAT_KEY", None),
@@ -70,14 +70,14 @@ class Pipeline:
 
     def _enable_debug(self, enable: bool = False):
         if enable:
-            print("AzureOpenAI enable debug logging")
+            print("Azure AI Inference enable debug logging")
             # Enable HTTPConnection debug logging to the console.
             HTTPConnection.debuglevel = 1
             logging.basicConfig(level=logging.DEBUG)
             logging.getLogger("openai").setLevel(logging.DEBUG)
             logging.getLogger("urllib3").setLevel(logging.DEBUG)
         else:
-            print("AzureOpenAI disable debug logging")
+            print("Azure AI Inference disable debug logging")
             # Enable HTTPConnection debug logging to the console.
             HTTPConnection.debuglevel = 0
             logging.basicConfig(level=logging.INFO)
@@ -92,8 +92,8 @@ class Pipeline:
 
         :return: ChatCompletionsClient client
         """
-        if self.vavles.AZURE_AI_CHAT_KEY:
-            credential = AzureKeyCredential(self.vavles.AZURE_AI_CHAT_KEY)
+        if self.valves.AZURE_AI_CHAT_KEY:
+            credential = AzureKeyCredential(self.valves.AZURE_AI_CHAT_KEY)
         else:
             credential = DefaultAzureCredential(exclude_environment_credential=True)
 
@@ -103,7 +103,7 @@ class Pipeline:
                 endpoint=self.valves.AZURE_OPENAI_ENDPOINT,
                 credential=credential
             )
-            print("ChatCompletionsClient created")
+            print("Azure AI Inference client created")
         except Exception as e:
             return f"Error: {e}"
 
