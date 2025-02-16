@@ -142,6 +142,10 @@ class Pipeline:
 
         stream = body.get("stream", False)
 
+        # o1 and o1-mini don't alow stream = True!
+        if model_id in ("o1", "o1-mini"):
+            stream = False
+
         # Base parameters for the API call
         parameters = {
             "model": model_id,
