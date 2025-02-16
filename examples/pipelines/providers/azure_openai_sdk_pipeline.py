@@ -9,6 +9,8 @@ requirements: azure-ai-inference, azure-identity, azure-core, pydantic
 environment_variables: AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_VERSION, AZURE_OPENAI_MODEL
 """
 
+from http.client import HTTPConnection
+import logging
 from typing import List, Union, Generator, Iterator, Optional
 from pydantic import BaseModel
 import os
@@ -26,10 +28,11 @@ class Pipeline:
         AZURE_OPENAI_API_VERSION: str
         AZURE_OPENAI_MODELS: str
         AZURE_OPENAI_MODEL_NAMES: str
+        AZURE_OPENAI_API_DEBUG: Optional[bool] = False
 
     def __init__(self):
         self.type = "manifold"
-        self.name = "Azure OpenAI SDK: "
+        self.name = "Azure OpenAI API: "
         self.valves = self.Valves(
             **{
                 "AZURE_OPENAI_API_KEY": os.getenv("AZURE_OPENAI_API_KEY", None),
@@ -37,6 +40,7 @@ class Pipeline:
                 "AZURE_OPENAI_API_VERSION": os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-01"),
                 "AZURE_OPENAI_MODELS": os.getenv("AZURE_OPENAI_MODELS", "gpt-4o-mini"),
                 "AZURE_OPENAI_MODEL_NAMES": os.getenv("AZURE_OPENAI_MODEL_NAMES", "GPT-4o-MINI"),
+                "AZURE_OPENAI_API_DEBUG": os.getenv("AZURE_OPENAI_API_DEBUG", False),
             }
         )
 
@@ -67,6 +71,13 @@ class Pipeline:
             print("AzureOpenAI client created")
         except Exception as e:
             return f"Error: {e}"
+
+        if self.valves.OPENAI_API_DEBUG:
+            # Enable HTTPConnection debug logging to the console.
+            HTTPConnection.debuglevel = 1
+            requests_log = logging.getLogger("urllib3")
+            requests_log.setLevel(logging.DEBUG)
+            requests_log.propagate = True
 
         return client
 
