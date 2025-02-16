@@ -40,7 +40,7 @@ class Pipeline:
                 "AZURE_OPENAI_API_VERSION": os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-01"),
                 "AZURE_OPENAI_MODELS": os.getenv("AZURE_OPENAI_MODELS", "gpt-4o-mini"),
                 "AZURE_OPENAI_MODEL_NAMES": os.getenv("AZURE_OPENAI_MODEL_NAMES", "GPT-4o-MINI"),
-                "AZURE_OPENAI_API_DEBUG": os.getenv("AZURE_OPENAI_API_DEBUG", False),
+                "AZURE_OPENAI_API_DEBUG": os.getenv("AZURE_OPENAI_API_DEBUG", "False").lower[0] in ("1","true","yes"),
             }
         )
 
