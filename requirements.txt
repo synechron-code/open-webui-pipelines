@@ -18,6 +18,9 @@ openai
 anthropic
 google-generativeai
 vertexai
+azure-ai-inference
+azure-identity
+azure-core
 
 # Database
 pymongo
