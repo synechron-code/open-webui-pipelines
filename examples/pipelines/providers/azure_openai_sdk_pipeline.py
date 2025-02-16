@@ -72,7 +72,7 @@ class Pipeline:
         except Exception as e:
             return f"Error: {e}"
 
-        if self.valves.OPENAI_API_DEBUG:
+        if self.valves.AZURE_OPENAI_API_DEBUG:
             # Enable HTTPConnection debug logging to the console.
             HTTPConnection.debuglevel = 1
             requests_log = logging.getLogger("urllib3")
