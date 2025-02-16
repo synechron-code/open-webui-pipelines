@@ -5,7 +5,7 @@ date: 2025-02-16
 version: 0.1
 license: MIT
 description: A pipeline for integrating with Azure OpenAI using the Azure OpenAI API and Managed Identities.
-requirements: openai, azure-ai-inference, azure-identity, azure-core, pydantic
+requirements: openai>=1.63.0, azure-ai-inference, azure-identity, azure-core, pydantic
 environment_variables: AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_VERSION, AZURE_OPENAI_MODEL, AZURE_OPENAI_API_DEBUG
 """
 
