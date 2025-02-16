@@ -44,18 +44,28 @@ class Pipeline:
             }
         )
 
-        if self.valves.AZURE_OPENAI_API_DEBUG:
+        self._enable_debug(self.valves.AZURE_OPENAI_API_DEBUG)
+
+        self.client = self._openai_client()
+
+        self.set_pipelines()
+        pass
+
+    def _enable_debug(self, enable: bool = False):
+        if enable:
             print("AzureOpenAI enable debug logging")
             # Enable HTTPConnection debug logging to the console.
             HTTPConnection.debuglevel = 1
             logging.basicConfig(level=logging.DEBUG)
             logging.getLogger("openai").setLevel(logging.DEBUG)
             logging.getLogger("urllib3").setLevel(logging.DEBUG)
-
-        self.client = self._openai_client()
-
-        self.set_pipelines()
-        pass
+        else:
+            print("AzureOpenAI disable debug logging")
+            # Enable HTTPConnection debug logging to the console.
+            HTTPConnection.debuglevel = 0
+            logging.basicConfig(level=logging.INFO)
+            logging.getLogger("openai").setLevel(logging.INFO)
+            logging.getLogger("urllib3").setLevel(logging.INFO)
 
     def _openai_client(self) -> AzureOpenAI:
         """
@@ -94,6 +104,7 @@ class Pipeline:
     async def on_valves_updated(self):
         print(f"on_valves_update: {__name__}")
         print(self.valves)
+        self._enable_debug(self.valves.AZURE_OPENAI_API_DEBUG)
         self.client = self._openai_client()
         self.set_pipelines()
 
