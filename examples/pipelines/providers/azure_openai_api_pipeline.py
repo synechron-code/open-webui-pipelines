@@ -145,11 +145,12 @@ class Pipeline:
             "model": model_id,
             "messages": messages,
             "stream": stream,
-            "temperature": body.get("temperature", 0.5),
+            "temperature": body.get("temperature", 1),
             "max_completion_tokens": body.get("max_tokens", 4000),
-            "top_p": body.get("openai_top_p", None),
-            "frequency_penalty": body.get("openai_frequency_penalty", None),
-            "presence_penalty": body.get("openai_presence_penalty", None),
+            "top_p": body.get("top_p", 1),
+            "frequency_penalty": body.get("frequency_penalty", 0),
+            "presence_penalty": body.get("presence_penalty", 0),
+            "user": body.get("user", None)
         }
 
         response: ChatCompletion = None
