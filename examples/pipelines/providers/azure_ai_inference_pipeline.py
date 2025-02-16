@@ -100,12 +100,13 @@ class Pipeline:
         try:
             client = ChatCompletionsClient(
                 api_version=self.valves.AZURE_AI_API_VERSION,
-                endpoint=self.valves.AZURE_OPENAI_ENDPOINT,
+                endpoint=self.valves.AZURE_AI_ENDPOINT,
                 credential=credential
             )
             print("Azure AI Inference client created")
         except Exception as e:
-            return f"Error: {e}"
+            print(f"Error: {e}")
+            raise e
 
         return client
 
