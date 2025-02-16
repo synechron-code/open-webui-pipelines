@@ -73,6 +73,7 @@ class Pipeline:
             return f"Error: {e}"
 
         if self.valves.AZURE_OPENAI_API_DEBUG:
+            print("AzureOpenAI enable debug logging")
             # Enable HTTPConnection debug logging to the console.
             HTTPConnection.debuglevel = 1
             requests_log = logging.getLogger("urllib3")
