@@ -4,7 +4,7 @@ author: davidsewell
 date: 2025-02-16
 version: 0.1
 license: MIT
-description: A pipeline for integrating with Azure OpenAI using the Azure OpenAI SDK.
+description: A pipeline for integrating with Azure OpenAI using the Azure OpenAI API and Managed Identities.
 requirements: azure-ai-inference, azure-identity, azure-core, pydantic
 environment_variables: AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_VERSION, AZURE_OPENAI_MODEL
 """
@@ -44,6 +44,14 @@ class Pipeline:
             }
         )
 
+        if self.valves.AZURE_OPENAI_API_DEBUG:
+            print("AzureOpenAI enable debug logging")
+            # Enable HTTPConnection debug logging to the console.
+            HTTPConnection.debuglevel = 1
+            requests_log = logging.getLogger("urllib3")
+            requests_log.setLevel(logging.DEBUG)
+            requests_log.propagate = True
+
         self.client = self._openai_client()
 
         self.set_pipelines()
@@ -71,14 +79,6 @@ class Pipeline:
             print("AzureOpenAI client created")
         except Exception as e:
             return f"Error: {e}"
-
-        if self.valves.AZURE_OPENAI_API_DEBUG:
-            print("AzureOpenAI enable debug logging")
-            # Enable HTTPConnection debug logging to the console.
-            HTTPConnection.debuglevel = 1
-            requests_log = logging.getLogger("urllib3")
-            requests_log.setLevel(logging.DEBUG)
-            requests_log.propagate = True
 
         return client
 
