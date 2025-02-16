@@ -118,10 +118,10 @@ class Pipeline:
         print(messages)
         print(user_message)
 
-        allowed_params = {'messages', 'temperature', 'role', 'content', 'contentPart', 'contentPartImage',
-                          'enhancements', 'dataSources', 'n', 'stream', 'stop', 'max_tokens', 'presence_penalty',
-                          'frequency_penalty', 'logit_bias', 'user', 'function_call', 'funcions', 'tools',
-                          'tool_choice', 'top_p', 'log_probs', 'top_logprobs', 'response_format', 'seed'}
+        # allowed_params = {'messages', 'temperature', 'role', 'content', 'contentPart', 'contentPartImage',
+        #                   'enhancements', 'dataSources', 'n', 'stream', 'stop', 'max_tokens', 'presence_penalty',
+        #                   'frequency_penalty', 'logit_bias', 'user', 'function_call', 'funcions', 'tools',
+        #                   'tool_choice', 'top_p', 'log_probs', 'top_logprobs', 'response_format', 'seed'}
 
         # remap user field
         if "user" in body and not isinstance(body["user"], str):
@@ -163,5 +163,4 @@ class Pipeline:
             if choices and len(choices) > 0:
                 content = choices[0].delta.content
                 if content:
-                    print(f"Chunk: {content}")
                     yield content
