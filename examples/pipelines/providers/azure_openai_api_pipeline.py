@@ -155,6 +155,8 @@ class Pipeline:
             "user": body.get("user", None)
         }
 
+        print(f"parameters: {parameters}")
+
         response: ChatCompletion = None
         try:
             response = self.client.chat.completions.create(**parameters)
