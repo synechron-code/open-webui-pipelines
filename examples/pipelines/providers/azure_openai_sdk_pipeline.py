@@ -49,7 +49,7 @@ class Pipeline:
         self.pipelines = [
             {"id": model, "name": name} for model, name in zip(models, model_names)
         ]
-        print(f"azure_openai_manifold_pipeline - models: {self.pipelines}")
+        print(f"azure_openai_sdk_pipeline - models: {self.pipelines}")
         pass
 
     async def on_valves_updated(self):
