@@ -1,3 +1,14 @@
+"""
+title: Azure OpenAI SDK
+author: davidsewell
+date: 2025-02-16
+version: 0.1
+license: MIT
+description: A pipeline for integrating with Azure OpenAI using the Azure OpenAI SDK.
+requirements: azure-ai-inference, azure-identity, azure-core, pydantic
+environment_variables: AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_VERSION, AZURE_OPENAI_MODEL
+"""
+
 from typing import List, Union, Generator, Iterator, Optional
 from pydantic import BaseModel
 import os
@@ -13,7 +24,8 @@ class Pipeline:
         AZURE_OPENAI_API_KEY: Optional[str] = None
         AZURE_OPENAI_ENDPOINT: str
         AZURE_OPENAI_API_VERSION: str
-        AZURE_OPENAI_MODEL: str
+        AZURE_OPENAI_MODELS: str
+        AZURE_OPENAI_MODEL_NAMES: str
 
     def __init__(self):
         self.type = "manifold"
