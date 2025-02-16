@@ -48,9 +48,9 @@ class Pipeline:
             print("AzureOpenAI enable debug logging")
             # Enable HTTPConnection debug logging to the console.
             HTTPConnection.debuglevel = 1
-            requests_log = logging.getLogger("urllib3")
-            requests_log.setLevel(logging.DEBUG)
-            requests_log.propagate = True
+            logging.basicConfig(level=logging.DEBUG)
+            logging.getLogger("openai").setLevel(logging.DEBUG)
+            logging.getLogger("urllib3").setLevel(logging.DEBUG)
 
         self.client = self._openai_client()
 
