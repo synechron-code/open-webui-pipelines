@@ -101,7 +101,7 @@ class Pipeline:
                 model = model_id,
                 stream = body.get("stream", False),
                 max_tokens = body.get("max_tokens", 1000),
-                max_tokens = body.get("temperature", 0.5)
+                temperature = body.get("temperature", 0.5)
             )
 
             if body.get("stream", False):
