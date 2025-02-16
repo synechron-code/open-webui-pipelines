@@ -1,7 +1,10 @@
 from typing import List, Union, Generator, Iterator, Optional
 from pydantic import BaseModel
-import requests
 import os
+
+from azure.ai.inference import ChatCompletionsClient
+from azure.identity import DefaultAzureCredential
+from azure.core.credentials import AzureKeyCredential
 
 
 class Pipeline:
@@ -10,21 +13,33 @@ class Pipeline:
         AZURE_OPENAI_API_KEY: Optional[str] = None
         AZURE_OPENAI_ENDPOINT: str
         AZURE_OPENAI_API_VERSION: str
-        AZURE_OPENAI_MODELS: str
-        AZURE_OPENAI_MODEL_NAMES: str
+        AZURE_OPENAI_MODEL: str
 
     def __init__(self):
         self.type = "manifold"
-        self.name = "Azure OpenAI: "
+        self.name = "Azure OpenAI SDK: "
         self.valves = self.Valves(
             **{
                 "AZURE_OPENAI_API_KEY": os.getenv("AZURE_OPENAI_API_KEY", None),
                 "AZURE_OPENAI_ENDPOINT": os.getenv("AZURE_OPENAI_ENDPOINT", "your-azure-openai-endpoint-here"),
                 "AZURE_OPENAI_API_VERSION": os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-01"),
-                "AZURE_OPENAI_MODELS": os.getenv("AZURE_OPENAI_MODELS", "gpt-35-turbo;gpt-4o"),
-                "AZURE_OPENAI_MODEL_NAMES": os.getenv("AZURE_OPENAI_MODEL_NAMES", "GPT-35 Turbo;GPT-4o"),
+                "AZURE_OPENAI_MODELS": os.getenv("AZURE_OPENAI_MODELS", "gpt-4o-mini"),
+                "AZURE_OPENAI_MODEL_NAMES": os.getenv("AZURE_OPENAI_MODEL_NAMES", "GPT-4o-MINI"),
             }
         )
+
+        if not self.valves.AZURE_OPENAI_API_KEY:
+            self.client = ChatCompletionsClient(
+                endpoint=self.valves.AZURE_OPENAI_ENDPOINT,
+                credential=DefaultAzureCredential(exclude_environment_credential=True),
+                credential_scopes=["https://cognitiveservices.azure.com/.default"]
+            )
+        else:
+            self.client = ChatCompletionsClient(
+                endpoint=self.valves.AZURE_OPENAI_ENDPOINT,
+                credential=AzureKeyCredential(self.valves.AZURE_OPENAI_API_KEY)
+            )
+
         self.set_pipelines()
         pass
 
@@ -59,41 +74,41 @@ class Pipeline:
         print(messages)
         print(user_message)
 
-        headers = {
-            "api-key": self.valves.AZURE_OPENAI_API_KEY,
-            "Content-Type": "application/json",
-        }
-
-        url = f"{self.valves.AZURE_OPENAI_ENDPOINT}/openai/deployments/{model_id}/chat/completions?api-version={self.valves.AZURE_OPENAI_API_VERSION}"
-
         allowed_params = {'messages', 'temperature', 'role', 'content', 'contentPart', 'contentPartImage',
                           'enhancements', 'dataSources', 'n', 'stream', 'stop', 'max_tokens', 'presence_penalty',
                           'frequency_penalty', 'logit_bias', 'user', 'function_call', 'funcions', 'tools',
                           'tool_choice', 'top_p', 'log_probs', 'top_logprobs', 'response_format', 'seed'}
+
         # remap user field
         if "user" in body and not isinstance(body["user"], str):
             body["user"] = body["user"]["id"] if "id" in body["user"] else str(body["user"])
-        filtered_body = {k: v for k, v in body.items() if k in allowed_params}
-        # log fields that were filtered out as a single line
-        if len(body) != len(filtered_body):
-            print(f"Dropped params: {', '.join(set(body.keys()) - set(filtered_body.keys()))}")
 
         try:
-            r = requests.post(
-                url=url,
-                json=filtered_body,
-                headers=headers,
-                stream=True,
+            response = self.client.complete(
+                messages = messages,
+                model = model_id,
+                stream = body.get("stream", False),
+                max_tokens = body.get("max_tokens", 1000),
+                max_tokens = body.get("temperature", 0.5)
             )
 
-            r.raise_for_status()
-            if body["stream"]:
-                return r.iter_lines()
+            if body.get("stream", False):
+                return self.stream_response(response)
             else:
-                return r.json()
+                return response.choices[0].message.content
+
         except Exception as e:
-            if r:
-                text = r.text
+            if response:
+                text = response.choices[0].message.content
                 return f"Error: {e} ({text})"
             else:
                 return f"Error: {e}"
+
+    def stream_response(self, response):
+        for chunk in response:
+            choices = chunk.get("choices")
+            if choices and len(choices) > 0:
+                content = choices[0]["delta"].get("content", "")
+                if content:
+                    print(f"Chunk: {content}")
+                    yield content
