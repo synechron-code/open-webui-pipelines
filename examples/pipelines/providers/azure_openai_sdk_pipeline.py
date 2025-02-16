@@ -92,11 +92,16 @@ class Pipeline:
         pass
 
     async def on_valves_updated(self):
+        print(f"on_valves_update: {__name__}")
+        print(self.valves)
+        self.client = self._openai_client()
         self.set_pipelines()
 
     async def on_startup(self):
         # This function is called when the server is started.
         print(f"on_startup:{__name__}")
+        print(self.valves)
+        self.client = self._openai_client()
         pass
 
     async def on_shutdown(self):
