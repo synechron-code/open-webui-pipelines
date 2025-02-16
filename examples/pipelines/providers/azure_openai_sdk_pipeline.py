@@ -119,9 +119,9 @@ class Pipeline:
             "stream": stream,
             "temperature": body.get("temperature", 0.5),
             "max_tokens": body.get("max_tokens", 1000),
-            "top_p": self.config.value("openai_top_p") or None,
-            "frequency_penalty": self.config.value("openai_frequency_penalty"),
-            "presence_penalty": self.config.value("openai_presence_penalty"),
+            "top_p": body.get("openai_top_p", None),
+            "frequency_penalty": body.get("openai_frequency_penalty", None),
+            "presence_penalty": body.get("openai_presence_penalty", None),
         }
 
         response: ChatCompletion = None
