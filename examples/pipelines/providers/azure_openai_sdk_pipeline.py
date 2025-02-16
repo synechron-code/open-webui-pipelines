@@ -95,6 +95,7 @@ class Pipeline:
         if "user" in body and not isinstance(body["user"], str):
             body["user"] = body["user"]["id"] if "id" in body["user"] else str(body["user"])
 
+        response = None
         try:
             response = self.client.complete(
                 messages = messages,
