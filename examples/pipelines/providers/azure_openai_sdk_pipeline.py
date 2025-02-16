@@ -159,9 +159,9 @@ class Pipeline:
 
     def stream_response(self, response: ChatCompletion):
         for chunk in response:
-            choices = chunk.get("choices")
+            choices = chunk.choices
             if choices and len(choices) > 0:
-                content = choices[0]["delta"].get("content", "")
+                content = choices[0].delta.content
                 if content:
                     print(f"Chunk: {content}")
                     yield content
