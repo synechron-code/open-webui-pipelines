@@ -13,7 +13,7 @@ from typing import List, Union, Generator, Iterator, Optional
 from pydantic import BaseModel
 import os
 
-from azure.ai.inference import ChatCompletionsClient
+from openai import AzureOpenAI, ChatCompletion
 from azure.identity import DefaultAzureCredential
 from azure.core.credentials import AzureKeyCredential
 
@@ -40,20 +40,35 @@ class Pipeline:
             }
         )
 
-        if not self.valves.AZURE_OPENAI_API_KEY:
-            self.client = ChatCompletionsClient(
-                endpoint=self.valves.AZURE_OPENAI_ENDPOINT,
-                credential=DefaultAzureCredential(exclude_environment_credential=True),
-                credential_scopes=["https://cognitiveservices.azure.com/.default"]
-            )
-        else:
-            self.client = ChatCompletionsClient(
-                endpoint=self.valves.AZURE_OPENAI_ENDPOINT,
-                credential=AzureKeyCredential(self.valves.AZURE_OPENAI_API_KEY)
-            )
+        self.client = self._openai_client()
 
         self.set_pipelines()
         pass
+
+    def _openai_client(self) -> AzureOpenAI:
+        """
+        Create an OpenAI client. Requires Azure Credentials. See the DefaultAzureCredential documentation for details
+        of the authentication process (it will cascade through multiple authentication methods until it finds one that
+        works, including a Workload Identity, an SPN via Env Vars, or az login credentials when running locally).
+
+        :return: AzureOpenAI client
+        """
+        default_credential = DefaultAzureCredential(exclude_environment_credential=True)
+        token = default_credential.get_token(
+            "https://cognitiveservices.azure.com/.default"
+        )
+
+        try:
+            client = AzureOpenAI(
+                api_version=self.valves.AZURE_OPENAI_API_VERSION,
+                azure_endpoint=self.valves.AZURE_OPENAI_ENDPOINT,
+                api_key=self.valves.AZURE_OPENAI_API_KEY or token.token
+            )
+            print("AzureOpenAI client created")
+        except Exception as e:
+            return f"Error: {e}"
+
+        return client
 
     def set_pipelines(self):
         models = self.valves.AZURE_OPENAI_MODELS.split(";")
@@ -95,17 +110,25 @@ class Pipeline:
         if "user" in body and not isinstance(body["user"], str):
             body["user"] = body["user"]["id"] if "id" in body["user"] else str(body["user"])
 
-        response = None
-        try:
-            response = self.client.complete(
-                messages = messages,
-                model = model_id,
-                stream = body.get("stream", False),
-                max_tokens = body.get("max_tokens", 1000),
-                temperature = body.get("temperature", 0.5)
-            )
+        stream = body.get("stream", False)
 
-            if body.get("stream", False):
+        # Base parameters for the API call
+        parameters = {
+            "model": model_id,
+            "messages": messages,
+            "stream": stream,
+            "temperature": body.get("temperature", 0.5),
+            "max_tokens": body.get("max_tokens", 1000),
+            "top_p": self.config.value("openai_top_p") or None,
+            "frequency_penalty": self.config.value("openai_frequency_penalty"),
+            "presence_penalty": self.config.value("openai_presence_penalty"),
+        }
+
+        response: ChatCompletion = None
+        try:
+            response = self.client.chat.completions.create(**parameters)
+
+            if stream:
                 return self.stream_response(response)
             else:
                 return response.choices[0].message.content
@@ -117,7 +140,7 @@ class Pipeline:
             else:
                 return f"Error: {e}"
 
-    def stream_response(self, response):
+    def stream_response(self, response: ChatCompletion):
         for chunk in response:
             choices = chunk.get("choices")
             if choices and len(choices) > 0:
