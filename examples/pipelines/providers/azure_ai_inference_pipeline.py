@@ -170,7 +170,7 @@ class Pipeline:
             "messages": messages,
             "stream": stream,
             "temperature": body.get("temperature", 1),
-            "max_completion_tokens": body.get("max_tokens", 4000),
+            "max_tokens": body.get("max_tokens", 4000),
             "top_p": body.get("top_p", 1),
             "frequency_penalty": body.get("frequency_penalty", 0),
             "presence_penalty": body.get("presence_penalty", 0),
