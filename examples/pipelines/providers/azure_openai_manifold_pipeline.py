@@ -92,6 +92,7 @@ class Pipeline:
         # o1 and o1-mini don't alow stream = True!
         if model_id in ("o1", "o1-mini"):
             allowed_params.remove('stream')
+            allowed_params.remove('max_tokens')
 
         # remap user field
         if "user" in body and not isinstance(body["user"], str):
@@ -111,8 +112,9 @@ class Pipeline:
 
             r.raise_for_status()
             if body["stream"]:
-                print(f"response: {r}")
-                return r.iter_lines()
+                iter = r.iter_lines()
+                print(f"response: {iter}")
+                return iter
             else:
                 print(f"response: {r.json()}")
                 return r.json()
