@@ -92,7 +92,7 @@ class Pipeline:
         # o1 and o1-mini don't alow stream = True!
         if model_id in ("o1", "o1-mini"):
             allowed_params.remove('stream')
-            allowed_params.remove('max_tokens')
+            body["max_completion_tokens"] = 4000
 
         # remap user field
         if "user" in body and not isinstance(body["user"], str):
