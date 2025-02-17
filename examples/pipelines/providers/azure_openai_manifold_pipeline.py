@@ -106,8 +106,10 @@ class Pipeline:
 
             r.raise_for_status()
             if body["stream"]:
+                print(f"response: {r}")
                 return r.iter_lines()
             else:
+                print(f"response: {r}")
                 return r.json()
         except Exception as e:
             if r:
