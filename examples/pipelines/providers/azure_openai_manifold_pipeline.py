@@ -8,7 +8,7 @@ from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 class Pipeline:
     class Valves(BaseModel):
         # You can add your custom valves here.
-        AZURE_OPENAI_API_KEY: Optional[str] = None
+        AZURE_OPENAI_API_KEY: Optional[str] = ""
         AZURE_OPENAI_ENDPOINT: str
         AZURE_OPENAI_API_VERSION: str
         AZURE_OPENAI_MODELS: str
@@ -19,7 +19,7 @@ class Pipeline:
         self.name = "Azure OpenAI: "
         self.valves = self.Valves(
             **{
-                "AZURE_OPENAI_API_KEY": os.getenv("AZURE_OPENAI_API_KEY", None),
+                "AZURE_OPENAI_API_KEY": os.getenv("AZURE_OPENAI_API_KEY", ""),
                 "AZURE_OPENAI_ENDPOINT": os.getenv("AZURE_OPENAI_ENDPOINT", "your-azure-openai-endpoint-here"),
                 "AZURE_OPENAI_API_VERSION": os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-01"),
                 "AZURE_OPENAI_MODELS": os.getenv("AZURE_OPENAI_MODELS", "gpt-35-turbo;gpt-4o"),
