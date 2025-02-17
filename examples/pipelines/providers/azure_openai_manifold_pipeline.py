@@ -88,6 +88,11 @@ class Pipeline:
                           'enhancements', 'dataSources', 'n', 'stream', 'stop', 'max_tokens', 'presence_penalty',
                           'frequency_penalty', 'logit_bias', 'user', 'function_call', 'funcions', 'tools',
                           'tool_choice', 'top_p', 'log_probs', 'top_logprobs', 'response_format', 'seed'}
+
+        # o1 and o1-mini don't alow stream = True!
+        if model_id in ("o1", "o1-mini"):
+            allowed_params.remove('stream')
+
         # remap user field
         if "user" in body and not isinstance(body["user"], str):
             body["user"] = body["user"]["id"] if "id" in body["user"] else str(body["user"])
