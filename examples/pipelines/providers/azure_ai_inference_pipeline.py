@@ -100,7 +100,7 @@ class Pipeline:
         try:
             client = ChatCompletionsClient(
                 api_version=self.valves.AZURE_AI_API_VERSION,
-                endpoint=self.valves.AZURE_AI_ENDPOINT,
+                endpoint=self.valves.AZURE_AI_CHAT_ENDPOINT,
                 credential=credential
             )
             print("Azure AI Inference client created")
