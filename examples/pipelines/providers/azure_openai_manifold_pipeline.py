@@ -78,7 +78,7 @@ class Pipeline:
         if self.valves.AZURE_OPENAI_API_KEY:
             headers["api-key"] = self.valves.AZURE_OPENAI_API_KEY
         else:
-            headers["Authorization"] = 'Bearer' + self.token
+            headers["Authorization"] = 'Bearer' + self.token.token
 
         url = f"{self.valves.AZURE_OPENAI_ENDPOINT}/openai/deployments/{model_id}/chat/completions?api-version={self.valves.AZURE_OPENAI_API_VERSION}"
 
