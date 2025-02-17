@@ -3,7 +3,7 @@ from pydantic import BaseModel
 import requests
 import os
 
-from azure.identity import DefaultAzureCredential
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
 class Pipeline:
     class Valves(BaseModel):
@@ -26,14 +26,14 @@ class Pipeline:
                 "AZURE_OPENAI_MODEL_NAMES": os.getenv("AZURE_OPENAI_MODEL_NAMES", "GPT-35 Turbo;GPT-4o"),
             }
         )
-        self.token = self._get_token()
+        self.bearer_token_provider = self._get_token()
         self.set_pipelines()
         pass
 
     def _get_token(self):
         try:
-            default_credential = DefaultAzureCredential(exclude_environment_credential=True)
-            return default_credential.get_token(
+            return get_bearer_token_provider(
+                DefaultAzureCredential(exclude_environment_credential=True),
                 "https://cognitiveservices.azure.com/.default"
             )
         except Exception as e:
@@ -78,7 +78,7 @@ class Pipeline:
         if self.valves.AZURE_OPENAI_API_KEY:
             headers["api-key"] = self.valves.AZURE_OPENAI_API_KEY
         else:
-            headers["Authorization"] = 'Bearer' + self.token.token
+            headers["Authorization"] = 'Bearer' + self.bearer_token_provider()
 
         url = f"{self.valves.AZURE_OPENAI_ENDPOINT}/openai/deployments/{model_id}/chat/completions?api-version={self.valves.AZURE_OPENAI_API_VERSION}"
 
