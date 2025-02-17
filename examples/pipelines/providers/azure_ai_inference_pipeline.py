@@ -173,8 +173,7 @@ class Pipeline:
             "max_tokens": body.get("max_tokens", 4000),
             "top_p": body.get("top_p", 1),
             "frequency_penalty": body.get("frequency_penalty", 0),
-            "presence_penalty": body.get("presence_penalty", 0),
-            "user": body.get("user", None)
+            "presence_penalty": body.get("presence_penalty", 0)
         }
 
         response = None
