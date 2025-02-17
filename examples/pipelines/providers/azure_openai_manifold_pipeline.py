@@ -112,6 +112,8 @@ class Pipeline:
         except Exception as e:
             if r:
                 text = r.text
+                print(f"Error: {e} ({text})")
                 return f"Error: {e} ({text})"
             else:
+                print(f"Error: {e}")
                 return f"Error: {e}"
